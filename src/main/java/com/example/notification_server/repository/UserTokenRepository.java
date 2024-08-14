@@ -1,4 +1,4 @@
-package com.example.notification_server;
+package com.example.notification_server.repository;
 
 import com.example.notification_server.entity.UserToken;
 import org.springframework.data.jpa.repository.JpaRepository;

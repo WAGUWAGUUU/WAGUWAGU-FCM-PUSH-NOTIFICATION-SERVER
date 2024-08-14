@@ -18,8 +18,8 @@ public class UserTokenController {
 
     @PostMapping("/save")
     public void save(@RequestBody UserTokenReq req) {
-        System.out.println(req.fcmToken());
-        System.out.println(req.userId());
+        System.out.println("UserTokenController fcm:"+req.fcmToken());
+        System.out.println("UserTokenController userId:"+req.userId());
         userTokenService.saveToken(req.userId(), req.fcmToken());
 
     }

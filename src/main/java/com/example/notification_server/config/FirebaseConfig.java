@@ -9,19 +9,27 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 @Configuration
 public class FirebaseConfig {
     @Bean
     public FirebaseMessaging firebaseMessaging() throws IOException {
-     if (FirebaseApp.getApps().isEmpty()) {GoogleCredentials googleCredentials = GoogleCredentials
-             .fromStream(new ClassPathResource("firebase/notification-server-dbc87-firebase-adminsdk-to26g-ca648d3799.json").getInputStream());
-         FirebaseOptions firebaseOptions = FirebaseOptions.builder()
-                 .setCredentials(googleCredentials).build();
-          FirebaseApp.initializeApp(firebaseOptions);}
+        try {
+            ClassPathResource resource = new ClassPathResource("firebase/notification-server-dbc87-firebase-adminsdk-to26g-500a34fc40.json");
+            InputStream serviceAccount = resource.getInputStream();
 
-         return FirebaseMessaging.getInstance();
+            FirebaseOptions options = FirebaseOptions.builder()
+                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                    .build();
+
+            FirebaseApp app = FirebaseApp.initializeApp(options);
+            return FirebaseMessaging.getInstance(app);
+        } catch (FileNotFoundException e) {
+            throw new IOException("Firebase configuration file not found", e);
+        }
     }
 }

@@ -1,6 +1,7 @@
 package com.example.notification_server.service;
 
 import com.example.notification_server.entity.UserToken;
+import com.example.notification_server.kafka.KafkaPushReqDTO;
 import com.example.notification_server.kafka.KafkaStatus;
 import com.example.notification_server.kafka.PushReqDto;
 import com.example.notification_server.request.UserTokenReq;
@@ -8,7 +9,6 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
 import lombok.RequiredArgsConstructor;
-import org.apache.catalina.User;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
@@ -16,10 +16,11 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class NotificationService {
 
+
     private final UserTokenService userTokenService;
     private final FirebaseMessaging firebaseMessaging;
 
-    public void sendNotification(UserTokenReq req, String status) {
+    public void sendNotification(UserTokenReq req, String status, String storeName) {
         try {
 
             String title;
@@ -27,24 +28,24 @@ public class NotificationService {
 
             switch (status) {
                 case "COOKING":
-                    title = "조리중입니다";
-                    body = ";)";
+                    title = storeName;
+                    body = "조리중 입니다";
                     break;
                 case "COOKED":
-                    title = "조리완료중입니다";
-                    body = ";)";
+                    title = storeName;
+                    body = "조리가 완료되었습니다";
                     break;
                 case "DELIVERING":
-                    title = "배달중입니다";
+                    title = storeName;
                     body = "부릉부릉";
                     break;
                 case "DELIVERED":
-                    title = "배달이 완료되었습니다";
-                    body = "맛있게 드세요";
+                    title = storeName;
+                    body = " 배달이 완료 되었습니다 맛있게 드세요";
                     break;
                 case "CANCEL":
-                    title = "주문이 취소되었습니다";
-                    body =";(";
+                    title = storeName;
+                    body ="주문이 취소되었습니다;(";
                     break;
 
                 default:
@@ -69,24 +70,27 @@ public class NotificationService {
     }
 
     @KafkaListener(topics = "order-topic")
-    public void kafkaListner(KafkaStatus<PushReqDto> msg) {
+    public void kafkaListner(KafkaStatus<KafkaPushReqDTO> msg) {
+        System.out.println("kafkafkafkakffkafkafakfaf"+ msg.data().customerId() + msg);
         Long userId = msg.data().customerId();
+        String storeName = msg.data().storeName();
 
-        if (userId != null) {
+        if (userId == null) {
             System.out.println("user not found");
             return;
         }
 
         UserToken tokenByUserId = userTokenService.getTokenByUserId(userId);
 
-        if (tokenByUserId != null) {
+        if (tokenByUserId == null) {
             System.out.println(" push token not found");
         }
 
 
 
             UserTokenReq req = new UserTokenReq(userId, tokenByUserId.getFcmToken());
-            sendNotification(req,msg.status());
+            System.out.println("kafka:"+msg);
+            sendNotification(req,msg.status(),storeName);
 
 
     }

@@ -1,13 +1,9 @@
 package com.example.notification_server.controller;
 
-import com.example.notification_server.NotificationMessage;
-import com.example.notification_server.entity.UserToken;
-import com.example.notification_server.request.UserTokenReq;
 import com.example.notification_server.service.NotificationService;
 import com.example.notification_server.service.UserTokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
